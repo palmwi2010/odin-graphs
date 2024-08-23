@@ -26,32 +26,22 @@ class Board {
 
     knightMoves(start, end) {
         // Check not already there
-        if (this.squareMatch(start, end)) return 0;
+        if (this.squareMatch(start, end)) return [start];
 
-        // Add nulls to mark new rows
-        let queue = this.getKnightMoves(start);
+        // Initialize queue
         const moves = this.getKnightMoves(start);
-        const root = {journey: start, moves: moves};
-        queue.push(null)
-        let depth = 1;
+        let queue = [{journey: [start], moves: moves}];
 
         while (queue.length > 0) {
-            let move = queue.shift();
-
-            // Handle end of move
-            if (move === null) {
-                depth++;
-                queue.push(null);
-                continue
+            const node = queue.shift();
+            for (let index = 0; index < node.moves.length; index++) {
+                const move = node.moves[index];
+                if (this.squareMatch(end, move)) return node.journey.concat([move]);
+                queue.push({journey: node.journey.concat([move]), moves: this.getKnightMoves(move)});
             }
-
-            // Either the end, or queue its moves
-            if (this.squareMatch(end, move)) return depth;
-            queue = queue.concat(this.getKnightMoves(move))
         }
-        return -1;
+        return null;
     }
 }
 
-let board = new Board();
-console.log(board.knightMoves([0,0], [1,2]));
+export default Board
